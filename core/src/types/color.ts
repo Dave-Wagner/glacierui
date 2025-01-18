@@ -123,3 +123,30 @@ export interface ColorDepth {
     /** Whether the color passes WCAG AAA for normal text */
     passesAAA: boolean;
   }
+
+  /**
+ * @interface Theme
+ * @description Complete theme definition including all color variations
+ */
+export interface Theme {
+  primary: ColorDepth;
+  accent: ColorDepth;
+  neutral: ColorDepth;
+  semantic: {
+    success: SemanticColor;
+    warning: SemanticColor;
+    error: SemanticColor;
+    info: SemanticColor;
+  };
+  background: {
+    default: string;
+    paper: string;
+    elevated: string;
+  };
+  text: {
+    primary: string;
+    secondary: string;
+    disabled: string;
+    inverse: string;
+  };
+}

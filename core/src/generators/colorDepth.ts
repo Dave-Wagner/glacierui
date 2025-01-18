@@ -4,19 +4,10 @@
  * @version 0.2.0
  */
 
-import { ColorDepth, SemanticColor } from '../../types/color';
+import { ColorDepth, SemanticColor } from '../types/color';
 import { ColorConverter } from '../utils/colorConverter';
 
-/**
- * @class ColorDepthGenerator
- * @description Generates complete color palettes and variations
- */
 export class ColorDepthGenerator {
-  /**
-   * Creates a full color depth scale from a base color
-   * @param baseColor - Base hex color
-   * @returns Full color depth scale
-   */
   static generateColorDepth(baseColor: string): ColorDepth {
     const rgb = ColorConverter.hexToRgb(baseColor);
     const hsl = ColorConverter.rgbToHsl(rgb);
@@ -35,11 +26,6 @@ export class ColorDepthGenerator {
     };
   }
 
-  /**
-   * Generates semantic color variations
-   * @param baseColor - Base hex color
-   * @returns Semantic color variations
-   */
   static generateSemanticColor(baseColor: string): SemanticColor {
     const rgb = ColorConverter.hexToRgb(baseColor);
     const hsl = ColorConverter.rgbToHsl(rgb);

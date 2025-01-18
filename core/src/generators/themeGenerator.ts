@@ -1,17 +1,8 @@
-/**
- * @module generators/themeGenerator
- * @description Complete theme generation system
- * @version 0.2.0
- */
-
-import { ColorDepth, SemanticColor } from '../../types/color';
+import { Theme, ColorDepth, SemanticColor } from '../types/color';
 import { ColorDepthGenerator } from './colorDepth';
+import { ColorConverter } from '../utils/colorConverter';
 import { findColorByWord } from '../constants/colorWords';
 
-/**
- * @interface ThemeOptions
- * @description Options for theme generation
- */
 interface ThemeOptions {
   baseColor: string;
   accentColor?: string;
@@ -19,42 +10,7 @@ interface ThemeOptions {
   isDark?: boolean;
 }
 
-/**
- * @interface Theme
- * @description Complete theme definition
- */
-export interface Theme {
-  primary: ColorDepth;
-  accent: ColorDepth;
-  neutral: ColorDepth;
-  semantic: {
-    success: SemanticColor;
-    warning: SemanticColor;
-    error: SemanticColor;
-    info: SemanticColor;
-  };
-  background: {
-    default: string;
-    paper: string;
-    elevated: string;
-  };
-  text: {
-    primary: string;
-    secondary: string;
-    disabled: string;
-    inverse: string;
-  };
-}
-
-/**
- * @class ThemeGenerator
- * @description Generates complete themes from colors or words
- */
 export class ThemeGenerator {
-  /**
-   * Creates a complete theme from options
-   * @param options - Theme generation options
-   */
   static generateTheme(options: ThemeOptions): Theme {
     const base = this.resolveColor(options.baseColor);
     const accent = this.resolveColor(options.accentColor || this.generateComplementary(base));
@@ -88,10 +44,6 @@ export class ThemeGenerator {
     };
   }
 
-  /**
-   * Resolves a color from either hex value or word
-   * @private
-   */
   private static resolveColor(input: string): string {
     if (input.startsWith('#')) {
       return input;
@@ -105,10 +57,6 @@ export class ThemeGenerator {
     return wordColor;
   }
 
-  /**
-   * Generates a complementary color
-   * @private
-   */
   private static generateComplementary(hex: string): string {
     const rgb = ColorConverter.hexToRgb(hex);
     const hsl = ColorConverter.rgbToHsl(rgb);
