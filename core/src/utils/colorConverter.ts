@@ -150,6 +150,13 @@ export class ColorConverter {
     };
   }
 
+  /**
+   * Calculates relative luminance of an RGB color
+   * @private
+   * @description Formula taken from W3C Web Content Accessibility Guidelines 2.1
+   * @param {RGB} rgb - RGB color object
+   * @returns {number} Relative luminance of the color
+   */
   private static calculateLuminance({ r, g, b }: RGB): number {
     const [rs, gs, bs] = [r, g, b].map(c => {
       const s = c / 255;
@@ -158,6 +165,14 @@ export class ColorConverter {
     return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
   }
 
+  /**
+   * Calculates contrast ratio between two luminance values
+   * @private
+   * @description Formula taken from W3C Web Content Accessibility Guidelines 2.1
+   * @param {number} l1 - Luminance of the first color
+   * @param {number} l2 - Luminance of the second color
+   * @returns {number} Contrast ratio between the two colors
+   */
   private static calculateContrast(l1: number, l2: number): number {
     const lighter = Math.max(l1, l2);
     const darker = Math.min(l1, l2);
