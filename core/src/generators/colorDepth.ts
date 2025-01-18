@@ -26,6 +26,11 @@ export class ColorDepthGenerator {
     };
   }
 
+  /**
+   * Generates semantic color variations
+   * @param baseColor - Base hex color
+   * @returns Semantic color variations
+   */
   static generateSemanticColor(baseColor: string): SemanticColor {
     const rgb = ColorConverter.hexToRgb(baseColor);
     const hsl = ColorConverter.rgbToHsl(rgb);
