@@ -1,0 +1,16 @@
+{
+  "name": "glacierui",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "bun run build:core && bun run build:cli",
+    "build:core": "cd packages/core && bun run build",
+    "build:cli": "cd packages/cli && bun run build",
+    "test": "bun test",
+    "clean": "rm -rf packages/*/dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "bun-types": "latest"
+  }
+}
