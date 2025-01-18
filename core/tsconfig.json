@@ -1,5 +1,5 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../glacierui/tsconfig.json",
     "compilerOptions": {
         "outDir": "./dist",
         "declaration": true,
