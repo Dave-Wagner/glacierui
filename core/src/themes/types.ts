@@ -3,6 +3,7 @@
  * @description Common theme type definitions
  */
 
+export type ThemeName = 'nord' | 'accessible' | 'system';
 export interface ThemeColors {
     // Main colors
     primary: string;
