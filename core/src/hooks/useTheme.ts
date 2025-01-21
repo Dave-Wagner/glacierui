@@ -1,3 +1,18 @@
+/**
+ * @module hooks/useTheme
+ * @description Core theme management hook and provider
+ *
+ * This module provides the foundation for GlacierUI's theming system. It manages:
+ * - Theme state and updates
+ * - System theme detection
+ * - Theme persistence
+ * - Theme transitions
+ *
+ * Other hooks build upon this core functionality:
+ * - useThemeOverride: Allows component-level theme customization
+ * - useThemeTransition: Manages smooth theme transitions
+ */
+
 import React, {
   useState,
   useEffect,
@@ -6,18 +21,35 @@ import React, {
   useCallback,
   useRef,
   useMemo,
-  type ReactNode
-} from 'react';
-import { Platform, Animated } from 'react-native';
-import { Theme, ThemeName, ThemePreference, themes, getTheme, isValidTheme } from '../themes';
+  type ReactNode,
+} from "react";
+import { Platform, Animated } from "react-native";
+import {
+  Theme,
+  ThemeName,
+  ThemePreference,
+  themes,
+  getTheme,
+  isValidTheme,
+} from "../themes";
 import {
   TransitionConfig,
   defaultTransition,
   createNativeTransition,
-  createWebTransitionStyle
-} from '../utils/transitions';
-import { getSystemTheme, type SystemTheme } from '../utils/theme';
+  createWebTransitionStyle,
+} from "../utils/transitions";
+import { getSystemTheme, type SystemTheme } from "../utils/theme";
 
+/**
+ * Core theme context value
+ *
+ * @property theme - Current theme object
+ * @property themeName - Current theme name or 'system'
+ * @property setTheme - Function to update the current theme
+ * @property isValidThemeName - Type guard for theme names
+ * @property systemTheme - Current system theme preference
+ * @property isTransitioning - Whether a theme transition is in progress
+ */
 interface ThemeContextValue {
   theme: Theme;
   themeName: ThemePreference;
@@ -27,100 +59,132 @@ interface ThemeContextValue {
   isTransitioning: boolean;
 }
 
+/**
+ * Default context value when no provider is present
+ */
 const defaultContextValue: ThemeContextValue = {
-  theme: getTheme('nord'),
-  themeName: 'system',
+  theme: getTheme("nord"),
+  themeName: "system",
   setTheme: async () => undefined,
   isValidThemeName: isValidTheme,
-  systemTheme: 'light',
-  isTransitioning: false
+  systemTheme: "light",
+  isTransitioning: false,
 };
 
-export const ThemeContext = createContext<ThemeContextValue>(defaultContextValue);
-ThemeContext.displayName = 'ThemeContext';
+export const ThemeContext =
+  createContext<ThemeContextValue>(defaultContextValue);
+ThemeContext.displayName = "ThemeContext";
 
+/**
+ * Theme provider props
+ */
 interface ThemeProviderProps {
+  /** Child components */
   children: ReactNode;
+  /** Initial theme preference */
   defaultTheme?: ThemePreference;
+  /** Storage key for theme persistence */
   storageKey?: string;
+  /** Transition configuration */
   transition?: TransitionConfig;
 }
 
-const THEME_STORAGE_KEY = '@glacierui:theme';
+const THEME_STORAGE_KEY = "@glacierui:theme";
 
 /**
- * Provides theme context and manages theme transitions for the application.
+ * GlacierUI theme provider component
  *
- * The `ThemeProvider` component wraps the application and provides theme-related
- * context values, including the current theme, theme name, and functions to set
- * the theme. It also handles system theme changes, loading stored themes, and
- * applying theme transitions.
+ * Provides theme context and management for the entire application.
  *
- * @param children - The child components to be rendered within the theme provider.
- * @param defaultTheme - The default theme preference, which can be 'system', a theme name, or undefined.
- * @param storageKey - The storage key used to persist the theme preference.
- * @param transition - The configuration for theme transition animations.
+ * @example
+ * ```tsx
+ * // Basic usage
+ * function App() {
+ *   return (
+ *     <ThemeProvider>
+ *       <YourApp />
+ *     </ThemeProvider>
+ *   );
+ * }
  *
- * @returns A JSX element that wraps the provided children with theme context.
+ * // With custom configuration
+ * function App() {
+ *   return (
+ *     <ThemeProvider
+ *       defaultTheme="dark"
+ *       storageKey="@myapp:theme"
+ *       transition={{
+ *         duration: 300,
+ *         timing: 'ease-in-out'
+ *       }}
+ *     >
+ *       <YourApp />
+ *     </ThemeProvider>
+ *   );
+ * }
+ * ```
  */
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
+  defaultTheme = "system",
   storageKey = THEME_STORAGE_KEY,
-  transition = defaultTransition
+  transition = defaultTransition,
 }: ThemeProviderProps): JSX.Element {
   const [themeName, setThemeName] = useState<ThemePreference>(defaultTheme);
   const [systemTheme, setSystemTheme] = useState<SystemTheme>(getSystemTheme());
   const [isTransitioning, setIsTransitioning] = useState(false);
   const animation = useRef(
-    Platform.OS === 'web' ? 1 : new Animated.Value(1)
+    Platform.OS === "web" ? 1 : new Animated.Value(1)
   ).current;
 
   // Handle theme transition
   const handleThemeChange = useCallback(async () => {
-    if (Platform.OS !== 'web') {
+    if (Platform.OS !== "web") {
       await createNativeTransition(animation as Animated.Value, transition);
     }
   }, [animation, transition]);
 
-  const setTheme = useCallback(async (name: ThemePreference) => {
-    try {
-      setIsTransitioning(true);
-      await handleThemeChange();
+  const setTheme = useCallback(
+    async (name: ThemePreference) => {
+      try {
+        setIsTransitioning(true);
+        await handleThemeChange();
 
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem(storageKey, name);
-      } else {
-        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-        await AsyncStorage.setItem(storageKey, name);
+        if (typeof window !== "undefined" && window.localStorage) {
+          localStorage.setItem(storageKey, name);
+        } else {
+          const AsyncStorage =
+            require("@react-native-async-storage/async-storage").default;
+          await AsyncStorage.setItem(storageKey, name);
+        }
+
+        setThemeName(name);
+        setIsTransitioning(false);
+      } catch (error) {
+        console.warn("Failed to save theme:", error);
+        setIsTransitioning(false);
       }
-
-      setThemeName(name);
-      setIsTransitioning(false);
-    } catch (error) {
-      console.warn('Failed to save theme:', error);
-      setIsTransitioning(false);
-    }
-  }, [storageKey, handleThemeChange]);
+    },
+    [storageKey, handleThemeChange]
+  );
 
   // System theme detection effect
   useEffect(() => {
-    /**
-     * Handles system theme changes by updating the context value
-     * and re-rendering the application with the new theme.
-     */
     const handleSystemThemeChange = () => {
       setSystemTheme(getSystemTheme());
     };
 
-    if (Platform.OS === 'web' && window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', handleSystemThemeChange);
-      return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    if (Platform.OS === "web" && window.matchMedia) {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      mediaQuery.addEventListener("change", handleSystemThemeChange);
+      return () =>
+        mediaQuery.removeEventListener("change", handleSystemThemeChange);
     } else {
       try {
-        const { Appearance } = require('react-native');
-        const subscription = Appearance.addChangeListener(handleSystemThemeChange);
+        const { Appearance } = require("react-native");
+        const subscription = Appearance.addChangeListener(
+          handleSystemThemeChange
+        );
         return () => subscription.remove();
       } catch {
         return undefined;
@@ -130,18 +194,15 @@ export function ThemeProvider({
 
   // Load stored theme
   useEffect(() => {
-    /**
-     * Loads the stored theme preference from local storage
-     * and updates the context value if found.
-     */
     const loadStoredTheme = async () => {
       try {
         let stored: string | null = null;
 
-        if (typeof window !== 'undefined' && window.localStorage) {
+        if (typeof window !== "undefined" && window.localStorage) {
           stored = localStorage.getItem(storageKey);
         } else {
-          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          const AsyncStorage =
+            require("@react-native-async-storage/async-storage").default;
           stored = await AsyncStorage.getItem(storageKey);
         }
 
@@ -149,7 +210,7 @@ export function ThemeProvider({
           setThemeName(stored);
         }
       } catch (error) {
-        console.warn('Failed to load theme:', error);
+        console.warn("Failed to load theme:", error);
       }
     };
 
@@ -157,11 +218,11 @@ export function ThemeProvider({
   }, [storageKey]);
 
   const activeTheme = useMemo(() => {
-    if (themeName === 'system') {
-      const baseTheme = getTheme('nord');
+    if (themeName === "system") {
+      const baseTheme = getTheme("nord");
       return {
         ...baseTheme,
-        colorMode: systemTheme
+        colorMode: systemTheme,
       };
     }
     return getTheme(themeName);
@@ -173,41 +234,76 @@ export function ThemeProvider({
     setTheme,
     isValidThemeName: isValidTheme,
     systemTheme,
-    isTransitioning
+    isTransitioning,
   };
 
-  const Wrapper = Platform.OS === 'web' ? 'div' : Animated.View;
-  const wrapperStyle = Platform.OS === 'web'
-    ? { transition: createWebTransitionStyle(transition) }
-    : { flex: 1, opacity: animation };
+  const Wrapper = Platform.OS === "web" ? "div" : Animated.View;
+  const wrapperStyle =
+    Platform.OS === "web"
+      ? { transition: createWebTransitionStyle(transition) }
+      : { flex: 1, opacity: animation };
 
   return React.createElement(
     ThemeContext.Provider,
     { value },
-    React.createElement(
-      Wrapper,
-      { style: wrapperStyle },
-      children
-    )
+    React.createElement(Wrapper, { style: wrapperStyle }, children)
   );
 }
 
 /**
- * Custom hook to access the current theme context.
+ * Hook for accessing and managing themes
  *
- * This hook provides access to the theme context, which includes
- * the current theme, theme name, and methods for setting the theme.
- * It ensures that the hook is used within a `ThemeProvider` by
- * throwing an error if the context is unavailable.
+ * This is the primary hook for interacting with GlacierUI's theme system.
+ * It provides access to the current theme and methods to modify it.
  *
- * @returns The current theme context value.
- * @throws Error if used outside of a `ThemeProvider`.
+ * @returns Theme context value
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * function MyComponent() {
+ *   const { theme, setTheme } = useTheme();
+ *
+ *   return (
+ *     <View style={{ backgroundColor: theme.colors.background }}>
+ *       <Button onPress={() => setTheme('dark')}>
+ *         Go Dark
+ *       </Button>
+ *     </View>
+ *   );
+ * }
+ *
+ * // System theme handling
+ * function ThemeAwareComponent() {
+ *   const { systemTheme, setTheme } = useTheme();
+ *
+ *   useEffect(() => {
+ *     setTheme('system'); // Follow system preference
+ *   }, []);
+ *
+ *   return (
+ *     <Text>Current system theme: {systemTheme}</Text>
+ *   );
+ * }
+ *
+ * // Transition handling
+ * function TransitionAwareComponent() {
+ *   const { isTransitioning } = useTheme();
+ *
+ *   return isTransitioning ? <Loading /> : <Content />;
+ * }
+ * ```
+ *
+ * @remarks
+ * This hook is used as a foundation by other hooks:
+ * - useThemeOverride builds on this to provide component-level theming
+ * - useThemeTransition uses the transition state for animations
  */
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
 
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
 
   return context;
