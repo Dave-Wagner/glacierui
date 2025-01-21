@@ -1,71 +1,52 @@
 {
-    "name": "@glacierui/core",
-    "version": "0.2.2",
-    "type": "module",
-    "main": "dist/index.js",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "bun build ./src/index.ts --outdir ./dist --target node",
-        "test": "bun test",
-        "clean": "rm -rf dist"
-    },
-    "peerDependencies": {
-        "react": "^18.0.0",
-        "react-native": ">=0.72.0",
-        "@types/react": "^18.0.0",
-        "@types/react-native": "^0.72.0"
-    },
-    "devDependencies": {
-        "@types/react": "^18.0.0",
-        "@types/react-native": "^0.72.0",
-        "typescript": "^5.0.0",
-        "@react-native-async-storage/async-storage": "^1.18.0"
-    },
-    "keywords": [
-        "design-system",
-        "theme",
-        "color",
-        "react",
-        "react-native",
-        "glacierui",
-        "glacier",
-        "ui",
-        "ui-kit",
-        "ui-library",
-        "ui-components",
-        "ui-styles",
-        "ui-theme",
-        "ui-design",
-        "ui-ux",
-        "ui-frontend",
-        "ui-backend",
-        "ui-mobile",
-        "ui-desktop",
-        "ui-web",
-        "ui-app",
-        "ui-website",
-        "ui-mobile-app",
-        "ui-desktop-app",
-        "ui-web-app",
-        "ui-website-app",
-        "ui-frontend-app",
-        "ui-backend-app",
-        "ui-admin-app",
-        "ui-portal-app",
-        "ui-dashboard-app",
-        "ui-ecommerce-app",
-        "ui-crm-app",
-        "ui-erp-app",
-        "ui-cms-app",
-        "ui-portal",
-        "ui-dashboard",
-        "ui-ecommerce",
-        "ui-crm",
-        "ui-erp",
-        "ui-cms"
-    ]
+  "name": "@glacierui/core",
+  "version": "0.2.2",
+  "description": "A modern, flexible design system for React and React Native",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "test": "bun test",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-native": ">=0.72.0"
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "^1.18.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/react-native": "^0.72.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "design-system",
+    "theme",
+    "color",
+    "react",
+    "react-native",
+    "ui",
+    "ui-library",
+    "components",
+    "typescript",
+    "glacier"
+  ],
+  "author": "Dave Wagner",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dave-Wagner/glacierui"
+  },
+  "bugs": {
+    "url": "https://github.com/Dave-Wagner/glacierui/issues"
+  },
+  "homepage": "https://glacierui.com"
 }
